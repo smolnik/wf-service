@@ -5,7 +5,6 @@ import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import net.adamsmolnik.setup.ServiceNameResolver;
 import net.adamsmolnik.util.Configuration;
 import net.adamsmolnik.workflow.DataProcessingWorkflowImpl;
 import com.amazonaws.ClientConfiguration;
@@ -21,9 +20,6 @@ import com.amazonaws.services.simpleworkflow.flow.WorkflowWorker;
 public class WebSetup implements ServletContextListener {
 
     @Inject
-    private ServiceNameResolver snr;
-
-    @Inject
     private Configuration conf;
 
     private WorkflowWorker wfw;;
@@ -32,7 +28,7 @@ public class WebSetup implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         ClientConfiguration config = new ClientConfiguration().withSocketTimeout(70 * 1000);
         AmazonSimpleWorkflow service = new AmazonSimpleWorkflowClient(config);
-        Map<String, String> confMap = conf.getServiceConfMap(snr.getServiceName());
+        Map<String, String> confMap = conf.getServiceConfMap();
         service.setEndpoint(confMap.get("swf.endpoint"));
         wfw = new WorkflowWorker(service, confMap.get("swf.domain"), confMap.get("swf.tasks"));
         try {
